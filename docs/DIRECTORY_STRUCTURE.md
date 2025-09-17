@@ -10,7 +10,7 @@ resume-analyzer/
 ├── src/
 │   ├── __init__.py
 │   │
-│   ├── models/                     # NEW - ML Python code
+│   ├── ml/                     # NEW - ML Python code
 │   │   ├── __init__.py
 │   │   ├── data_generator.py       # Synthetic training data generator
 │   │   ├── classification.py       # Fine-tuned embeddings training
