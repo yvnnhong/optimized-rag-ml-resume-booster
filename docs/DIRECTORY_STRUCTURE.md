@@ -96,24 +96,25 @@ optimized-rag-ml-resume-booster/
 └── vector_db/                    # ChromaDB storage (auto-created)
 
 ```
+## File Organization by Functionality:
 
-## Essential Python Files to Create:
+### `src/ml/data_generator/` (3 files):
+- `tech_taxonomy.py` - Domain knowledge (skills, job templates, resume templates)
+- `profile_generators.py` - Generation logic (jobs, resumes, formatting, metrics)  
+- `data_generator.py` - Main orchestration (dataset creation, I/O, statistics)
 
-### NEW ML Components:
-1. `src/models/__init__.py`
-2. `src/models/data_generator.py` (already created)
-3. `src/models/classification.py` (to create)
-4. `src/models/scoring.py` (to create) 
-5. `src/models/model_utils.py` (to create)
+### `src/ml/classification/` (3 files):
+- `embedding_models.py` - Model architectures (Siamese, multi-task, loss functions)
+- `training_pipeline.py` - Training infrastructure (datasets, loops, persistence)
+- `classification.py` - High-level API and CLI interface
 
-### NEW Scripts:
-6. `scripts/train_models.py` (training automation)
-7. `scripts/generate_data.py` (data generation script)
+### `src/ml/scoring/` (3 files to be created):
+- `scoring_models.py` - PyTorch neural networks for scoring
+- `feature_extractors.py` - Feature engineering from text/embeddings
+- `scoring.py` - Main scoring interface and training
 
-### NEW Configuration:
-8. `config.py` (centralized settings)
-9. `app.py` (Gradio interface)
-10. `src/utils/logging_config.py` (logging setup)
+### Shared:
+- `src/ml/model_utils.py` - Common utilities for all ML components
 
 ### EXISTING Files (keep as-is):
 - All current parser and database files from prototype
