@@ -1,4 +1,4 @@
-# ML Resume Analyzer - Directory Structure (Backbone)
+# ML Resume Analyzer - Directory Structure (Updated)
 
 ```
 optimized-rag-ml-resume-booster/
@@ -27,9 +27,18 @@ optimized-rag-ml-resume-booster/
 │   │   │
 │   │   ├── scoring/               # Neural scoring models
 │   │   │   ├── __init__.py
-│   │   │   ├── scoring_models.py   # PyTorch neural networks
-│   │   │   ├── feature_extractors.py  # Feature engineering
-│   │   │   └── scoring.py         # Main scoring interface
+│   │   │   ├── models/            # Individual model architectures
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── match_scorer.py      # MatchScorer class
+│   │   │   │   ├── ats_scorer.py        # ATSScorer class
+│   │   │   │   ├── skill_gap_analyzer.py # SkillGapAnalyzer class
+│   │   │   │   ├── experience_predictor.py # ExperienceGapPredictor class
+│   │   │   │   ├── multitask_scorer.py  # MultiTaskScorer class
+│   │   │   │   └── ensemble_scorer.py   # EnsembleScorer class
+│   │   │   ├── loss_functions.py        # Custom loss functions
+│   │   │   ├── evaluation.py           # Metrics and evaluation utilities
+│   │   │   ├── feature_extractors.py   # Feature engineering
+│   │   │   └── scoring.py             # Main scoring interface
 │   │   │
 │   │   └── model_utils.py         # Shared utilities (loading/saving)
 │   │
@@ -82,7 +91,15 @@ optimized-rag-ml-resume-booster/
 │   │   │   └── test_classification.py
 │   │   │
 │   │   └── test_scoring/
-│   │       ├── test_scoring_models.py
+│   │       ├── test_models/
+│   │       │   ├── test_match_scorer.py
+│   │       │   ├── test_ats_scorer.py
+│   │       │   ├── test_skill_gap_analyzer.py
+│   │       │   ├── test_experience_predictor.py
+│   │       │   ├── test_multitask_scorer.py
+│   │       │   └── test_ensemble_scorer.py
+│   │       ├── test_loss_functions.py
+│   │       ├── test_evaluation.py
 │   │       ├── test_feature_extractors.py
 │   │       └── test_scoring.py
 │   │
@@ -94,8 +111,8 @@ optimized-rag-ml-resume-booster/
 │   └── generate_data.py          # Generate training dataset
 │
 └── vector_db/                    # ChromaDB storage (auto-created)
-
 ```
+
 ## File Organization by Functionality:
 
 ### `src/ml/data_generator/` (3 files):
@@ -108,10 +125,18 @@ optimized-rag-ml-resume-booster/
 - `training_pipeline.py` - Training infrastructure (datasets, loops, persistence)
 - `classification.py` - High-level API and CLI interface
 
-### `src/ml/scoring/` (3 files to be created):
-- `scoring_models.py` - PyTorch neural networks for scoring
+### `src/ml/scoring/` (Refactored into focused files):
+- `models/` subdirectory:
+  - `match_scorer.py` - Overall match scoring model
+  - `ats_scorer.py` - ATS compatibility scorer
+  - `skill_gap_analyzer.py` - Skill gap analysis with attention
+  - `experience_predictor.py` - Experience gap prediction
+  - `multitask_scorer.py` - Multi-task learning model
+  - `ensemble_scorer.py` - Model ensemble combining
+- `loss_functions.py` - Custom loss functions (contrastive, focal, etc.)
+- `evaluation.py` - Metrics and model evaluation utilities
 - `feature_extractors.py` - Feature engineering from text/embeddings
-- `scoring.py` - Main scoring interface and training
+- `scoring.py` - Main scoring interface and training pipeline
 
 ### Shared:
 - `src/ml/model_utils.py` - Common utilities for all ML components
