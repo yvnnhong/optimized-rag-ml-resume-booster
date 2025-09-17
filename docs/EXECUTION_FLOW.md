@@ -42,10 +42,18 @@ Gradio Interface Output
 **Output**: Custom embedding model saved to `models/embeddings/`
 
 #### 2.2 Neural Scoring Models
-**Files**: `src/ml/scoring/` (3 files)
-- `scoring_models.py` - PyTorch neural networks for scoring
+**Files**: `src/ml/scoring/` (9 files)
+- `models/` subdirectory:
+  - `match_scorer.py` - Overall match scoring model
+  - `ats_scorer.py` - ATS compatibility scorer
+  - `skill_gap_analyzer.py` - Skill gap analysis with attention
+  - `experience_predictor.py` - Experience gap prediction
+  - `multitask_scorer.py` - Multi-task learning model
+  - `ensemble_scorer.py` - Model ensemble combining
+- `loss_functions.py` - Custom loss functions (contrastive, focal, etc.)
+- `evaluation.py` - Metrics and model evaluation utilities
 - `feature_extractors.py` - Feature engineering from text/embeddings
-- `scoring.py` - Main scoring interface and training
+- `scoring.py` - Main scoring interface and training pipeline
 
 **Purpose**: PyTorch neural networks that predict match scores from features
 **Input**: Embeddings + extracted features (skill overlap, experience gaps, etc.)
