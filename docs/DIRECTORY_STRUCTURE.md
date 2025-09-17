@@ -27,7 +27,7 @@ optimized-rag-ml-resume-booster/
 │   │   │
 │   │   ├── scoring/               # Neural scoring models
 │   │   │   ├── __init__.py
-│   │   │   ├── models/            # Individual model architectures
+│   │   │   ├── individual_model_archs/            # Individual model architectures
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── match_scorer.py      # MatchScorer class
 │   │   │   │   ├── ats_scorer.py        # ATSScorer class
