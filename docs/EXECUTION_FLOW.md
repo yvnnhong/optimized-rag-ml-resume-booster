@@ -1,4 +1,4 @@
-# ML-Driven Resume Analyzer - Execution Flow (Updated)
+# ML-Driven Resume Analyzer - Execution Flow (Updated for Refactored Structure)
 
 ## Project Overview
 RAG-based resume optimization tool using fine-tuned ML models to analyze resume-job description matches and provide ATS optimization recommendations.
@@ -20,41 +20,41 @@ Gradio Interface Output
 ## File Structure & Execution Flow
 
 ### 1. Data Generation Phase (Training Setup)
-**File**: `src/models/data_generator.py`
-- **Purpose**: Generate synthetic resume-job pairs with ground truth labels
-- **Output**: Training dataset with match scores (0-1) and binary labels
-- **Execution**: Run once to create training data for ML models
-- **Key Functions**: 
-  - `generate_training_dataset()` - Creates labeled examples
-  - Tech skill taxonomies for realistic job descriptions
-  - Resume templates with controlled skill overlap percentages
+**Files**: `src/ml/data_generator/` (3 files)
+- `tech_taxonomy.py` - Domain knowledge (skills, job templates, resume templates)
+- `profile_generators.py` - Generation logic (jobs, resumes, formatting, metrics)  
+- `data_generator.py` - Main orchestration (dataset creation, I/O, statistics)
+
+**Purpose**: Generate synthetic resume-job pairs with ground truth labels
+**Output**: Training dataset with match scores (0-1) and binary labels saved to `data/training/`
+**Execution**: Run once to create training data for ML models
 
 ### 2. Model Training Phase
 
 #### 2.1 Fine-tuned Embeddings
-**File**: `src/models/classification.py`
-- **Purpose**: Fine-tune sentence transformers on domain-specific resume-job pairs
-- **Input**: Synthetic training dataset from data_generator
-- **Output**: Custom embedding model saved to `models/embeddings/`
-- **Key Components**:
-  - `ResumeJobClassifier` class with fine-tuning pipeline
-  - Custom training loop using sentence-transformers library
-  - Evaluation metrics and model persistence
+**Files**: `src/ml/classification/` (3 files)
+- `embedding_models.py` - Model architectures (Siamese, multi-task, loss functions)
+- `training_pipeline.py` - Training infrastructure (datasets, loops, persistence)
+- `classification.py` - High-level API and CLI interface
+
+**Purpose**: Fine-tune sentence transformers on domain-specific resume-job pairs
+**Input**: Synthetic training dataset from data_generator
+**Output**: Custom embedding model saved to `models/embeddings/`
 
 #### 2.2 Neural Scoring Models
-**File**: `src/models/scoring.py`
-- **Purpose**: PyTorch neural networks that predict match scores from features
-- **Input**: Embeddings + extracted features (skill overlap, experience gaps, etc.)
-- **Output**: Trained scoring models saved to `models/scorers/`
-- **Key Components**:
-  - `MatchScorer` - Multi-layer perceptron for overall matching
-  - `ATSScorer` - Specialized model for ATS compatibility
-  - Feature extraction from text similarities and metadata
+**Files**: `src/ml/scoring/` (3 files)
+- `scoring_models.py` - PyTorch neural networks for scoring
+- `feature_extractors.py` - Feature engineering from text/embeddings
+- `scoring.py` - Main scoring interface and training
+
+**Purpose**: PyTorch neural networks that predict match scores from features
+**Input**: Embeddings + extracted features (skill overlap, experience gaps, etc.)
+**Output**: Trained scoring models saved to `models/scorers/`
 
 #### 2.3 Model Utilities
-**File**: `src/models/model_utils.py`
-- **Purpose**: Loading, saving, and managing trained models
-- **Functions**: Model persistence, version management, inference helpers
+**File**: `src/ml/model_utils.py`
+**Purpose**: Loading, saving, and managing trained models across all ML components
+**Functions**: Model persistence, version management, inference helpers
 
 ### 3. Text Processing Pipeline (Existing, No Changes)
 
@@ -96,12 +96,12 @@ Gradio Interface Output
 - **Current State**: Uses hardcoded thresholds and basic similarity
 - **New Implementation**: 
   - Load trained models from `models/embeddings/` and `models/scorers/`
-  - Replace hardcoded logic with ML predictions
+  - Replace hardcoded logic with ML predictions from `src/ml/` components
   - Use fine-tuned embeddings for semantic similarity
   - Neural scoring for final match predictions
 
 **Key Changes**:
-- `match_resume_to_job()` now calls ML models instead of rules
+- `match_resume_to_job()` now calls trained models from ML subdirectories
 - Dynamic similarity thresholds learned from data
 - Multi-dimensional scoring (overall match, ATS score, skill gaps)
 
@@ -112,15 +112,11 @@ Gradio Interface Output
 - **Purpose**: Web interface for users to upload resumes and job descriptions
 - **Input**: PDF resume file + job description text
 - **Output**: Match analysis with recommendations and scores
-- **Components**:
-  - File upload for resume PDF
-  - Text input for job description
-  - Results display with visualizations
 
 #### 6.2 Configuration
 **File**: `config.py`
 - **Purpose**: Centralized configuration for model paths, hyperparameters
-- **Contains**: Model file paths, training settings, API configurations
+- **Contains**: Paths to models in subdirectories, training settings
 
 #### 6.3 Logging
 **File**: `src/utils/logging_config.py`
@@ -133,19 +129,21 @@ Gradio Interface Output
 1. **Generate Training Data**
    ```bash
    python scripts/generate_data.py
+   # Uses: src/ml/data_generator/data_generator.py
    # Creates: data/training/synthetic_dataset.json
    ```
 
 2. **Train All Models**
    ```bash
    python scripts/train_models.py
+   # Uses: src/ml/classification/ and src/ml/scoring/
    # Creates: models/embeddings/ and models/scorers/
    ```
 
    Or train individually:
    ```bash
-   python -m src.models.classification --train
-   python -m src.models.scoring --train
+   python -m src.ml.classification.classification --train
+   python -m src.ml.scoring.scoring --train
    ```
 
 ### Production Phase (Per User Request)
@@ -161,12 +159,28 @@ Gradio Interface Output
    - **Text Processing**: `src/parser/text_processor.py` → cleaned text  
    - **Section Parsing**: `src/parser/section_parser.py` → structured resume
    - **Job Analysis**: `src/database/job_analyzer.py` → structured job requirements
-   - **ML Matching**: `src/database/vector_store.py` → calls trained models:
-     - Fine-tuned embeddings for semantic similarity
-     - Neural scorers for final match prediction
+   - **ML Matching**: `src/database/vector_store.py` → loads and calls trained models:
+     - Fine-tuned embeddings from `src/ml/classification/`
+     - Neural scorers from `src/ml/scoring/`
    - **Results**: Match score, missing skills, ATS recommendations
 
-## Key Differences from Original Architecture (see https://github.com/yvnnhong/rag-nlp-resume-booster)
+## Import Structure for Refactored Components
+
+```python
+# Data generation
+from src.ml.data_generator.data_generator import TechJobDataGenerator
+
+# Classification
+from src.ml.classification.classification import ResumeJobClassifier
+
+# Scoring  
+from src.ml.scoring.scoring import ResumeScorer
+
+# Utilities
+from src.ml.model_utils import ModelManager
+```
+
+## Key Differences from Original Architecture
 
 ### Before (Rule-Based)
 - Hardcoded similarity thresholds (0.6, 0.8, 0.95)
@@ -174,31 +188,50 @@ Gradio Interface Output
 - Simple keyword matching
 - No learning capability
 
-### After (ML-Driven)
+### After (ML-Driven with Refactored Structure)
 - **Learned similarity thresholds** from training data
 - **Neural networks discover** optimal feature combinations
 - **Fine-tuned embeddings** understand resume/job context better
 - **Continuous improvement** possible with new training data
+- **Modular ML components** organized in logical subdirectories
 
 ## Model Files Structure
 ```
 models/
-├── embeddings/                 # Fine-tuned sentence transformers
+├── embeddings/                 # From src/ml/classification/
 │   ├── config.json
 │   ├── pytorch_model.bin
 │   ├── tokenizer_config.json
 │   └── vocab.txt
-├── scorers/                    # PyTorch neural networks
+├── scorers/                    # From src/ml/scoring/
 │   ├── match_scorer.pth        # Overall match predictor
 │   ├── ats_scorer.pth         # ATS compatibility scorer
 │   └── model_metadata.json    # Model configs and metrics
+```
+
+## ML Source Code Structure
+```
+src/ml/
+├── data_generator/            # Synthetic data creation
+│   ├── tech_taxonomy.py
+│   ├── profile_generators.py
+│   └── data_generator.py
+├── classification/            # Fine-tuned embeddings
+│   ├── embedding_models.py
+│   ├── training_pipeline.py
+│   └── classification.py
+├── scoring/                   # Neural scoring models
+│   ├── scoring_models.py
+│   ├── feature_extractors.py
+│   └── scoring.py
+└── model_utils.py            # Shared utilities
 ```
 
 ## Data Files Structure
 ```
 data/
 ├── training/
-│   └── synthetic_dataset.json  # Generated training examples
+│   └── synthetic_dataset.json  # Generated by data_generator/
 ├── sample_resumes/             # Test PDFs (existing)
 └── sample_jobs/               # Test job descriptions
     ├── software_engineer.txt
@@ -206,16 +239,4 @@ data/
     └── devops_engineer.txt
 ```
 
-## Dependencies
-```txt
-# Existing
-PyMuPDF, chromadb, sentence-transformers, numpy
-
-# NEW ML dependencies
-torch>=2.0.0
-scikit-learn>=1.3.0
-transformers>=4.30.0
-gradio>=3.40.0
-pandas>=2.0.0
-matplotlib>=3.7.0
-```
+This refactored structure provides better organization while maintaining the same ML-driven functionality, making the codebase more maintainable and scalable.
