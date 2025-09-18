@@ -121,5 +121,24 @@ class CandidateProfileGenerator:
         name:str = f"{first_name} {last_name}"
         email = f"{first_name.lower()}.{last_name.lower()}@email.com"
         #determine skill overlap based on match type 
+        """
+        random.uniform(a, b): returns a random float between a and b (inclusive).
+        Both endpoints can be returned.
+        It's a uniform distribution (all values are equally likely in that range).
+        """
         if match_type == 'strong_match':
-            skill_overlap = random.uniform(0.7, 0.9)
+            skill_overlap = random.uniform(0.7, 0.9) #70%-90% match
+            exp_level_match = True
+            exp_years_variance = random.uniform(-0.2, 0.3) #-20% to +30% variance
+        elif match_type == 'partial_match':
+            skill_overlap = random.uniform(0.4, 0.7) #40%-70%
+            exp_level_match = random.choice([True, False])
+            exp_years_variance = random.uniform(-0.4, 0.2) #-40% to +20% variance
+        else: #weak_match or no_match
+            skill_overlap = random.uniform(0.1, 0.4)
+            exp_level_match = False
+            exp_years_variance = random.uniform(-0.6, -0.1) #below requirements 
+
+        #next: generate skills based on overlap 
+    
+        
