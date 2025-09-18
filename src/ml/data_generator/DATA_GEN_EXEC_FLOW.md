@@ -6,7 +6,7 @@ Creates synthetic resume-job pairs with ground truth labels for ML model trainin
 ## File Execution Order
 
 ### 1. `tech_taxonomy.py` (Foundation)
-**Purpose**: Domain knowledge and template definitions
+**Purpose**: Domain knowledge and template definitions. This is the data generation template.
 **Contains**: 
 - Tech skill categories (programming languages, frameworks, databases, cloud tools)
 - Job description templates for different roles (SWE, data scientist, DevOps, etc.)
