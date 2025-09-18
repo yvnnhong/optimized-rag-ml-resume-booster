@@ -107,3 +107,19 @@ class JobDescriptionGenerator:
             responsibilities=template['responsibilities'],
             industry='technology'
         )
+
+class CandidateProfileGenerator: 
+    """Generate synthetic candidate profiles"""
+    def __init__(self, taxonomy: TechSkillsTaxonomy): 
+        self.taxonomy = taxonomy
+
+    def generate(self, target_job: JobRequirement, match_type: str) -> CandidateProfile: 
+        """Generate a candidate profile that matches/doesn't match the job. """
+        #Generate basic info 
+        first_name = random.choice(self.taxonomy.first_names)
+        last_name = random.choice(self.taxonomy.last_names)
+        name:str = f"{first_name} {last_name}"
+        email = f"{first_name.lower()}.{last_name.lower()}@email.com"
+        #determine skill overlap based on match type 
+        if match_type == 'strong_match':
+            skill_overlap = random.uniform(0.7, 0.9)
