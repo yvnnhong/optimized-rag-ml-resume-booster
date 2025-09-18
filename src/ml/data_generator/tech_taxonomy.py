@@ -166,3 +166,12 @@ class TechSkillsTaxonomy:
                 ]
             }
         }
+
+    def get_skills_by_path(self, skill_path: str):
+        """Get skills by dot notation path (e.g., 'programming_languages.backend')"""
+        category, subcategory = skill_path.split('.')
+        return getattr(self, category)[subcategory]
+        #e.x. skill_path = "programming_languages.backend"
+        #category, subcategory = skill_path.split('.')
+        #category = programming_languages
+        #subcategory = backend
