@@ -11,6 +11,12 @@ class TechSkillsTaxonomy:
         self._initialize_skills()
         self._initialize_job_templates()
         self._initialize_resume_templates()
+        self._initialize_names_and_companies()
+    
+    def _initialize_names_and_companies(self):
+        self.first_names = ['John', 'Jane', 'Alex', 'Sam']
+        self.last_names = ['Doe', 'Smith', 'Johnson', 'Brown'] 
+        self.company_names = ['Previous Company', 'Former Employer', 'Tech Corp']
     
     def _initialize_skills(self): 
         """Initialize comprehensive tech skills taxonomy."""
