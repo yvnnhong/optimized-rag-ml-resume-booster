@@ -3,6 +3,7 @@
 Tech skills taxonomy and job/resume templates.
 Handles all the domain knowledge about tech skills, job types, and resume structures.
 """
+from typing import List, Any, Dict
 
 class TechSkillsTaxonomy:
     """Comprehensive tech skills taxonomy."""
@@ -13,39 +14,39 @@ class TechSkillsTaxonomy:
     
     def _initialize_skills(self): 
         """Initialize comprehensive tech skills taxonomy."""
-        self.programming_languages = {
+        self.programming_languages: Dict[str, List[str]] = {
             'backend': ['Python', 'Java', 'Go', 'Rust', 'C++', 'C#', 'Scala', 'Ruby', 'PHP'],
             'frontend': ['JavaScript', 'TypeScript', 'HTML5', 'CSS3', 'Dart'],
             'mobile': ['Swift', 'Kotlin', 'Flutter', 'React Native', 'Objective-C'],
             'data': ['Python', 'R', 'SQL', 'Scala', 'Julia', 'MATLAB'],
             'systems': ['C', 'C++', 'Rust', 'Go', 'Assembly', 'Bash']
         }
-        self.frameworks = {
+        self.frameworks: Dict[str, List[str]] = {
             'web_backend': ['Django', 'Flask', 'FastAPI', 'Spring Boot', 'Express.js', 'Ruby on Rails', 'ASP.NET'],
             'web_frontend': ['React', 'Angular', 'Vue.js', 'Svelte', 'Next.js', 'Nuxt.js', 'Ember.js'],
             'mobile': ['React Native', 'Flutter', 'Xamarin', 'Ionic', 'NativeScript'],
             'ml_ai': ['PyTorch', 'TensorFlow', 'Scikit-learn', 'Keras', 'Hugging Face', 'OpenCV', 'spaCy'],
             'data': ['Pandas', 'NumPy', 'Apache Spark', 'Kafka', 'Airflow', 'Dask']
         }
-        self.databases = {
+        self.databases: Dict[str, List[str]] = {
             'relational': ['PostgreSQL', 'MySQL', 'SQLite', 'Oracle', 'SQL Server'],
             'nosql': ['MongoDB', 'Redis', 'Elasticsearch', 'Cassandra', 'DynamoDB', 'Neo4j'],
             'data_warehouses': ['Snowflake', 'BigQuery', 'Redshift', 'ClickHouse']
         }
-        self.cloud_devops = {
+        self.cloud_devops: Dict[str, List[str]] = {
             'cloud_platforms': ['AWS', 'Google Cloud Platform', 'Microsoft Azure', 'DigitalOcean'],
             'containerization': ['Docker', 'Kubernetes', 'Podman', 'OpenShift'],
             'ci_cd': ['Jenkins', 'GitHub Actions', 'GitLab CI', 'CircleCI', 'Travis CI'],
             'infrastructure': ['Terraform', 'Ansible', 'Puppet', 'Chef', 'CloudFormation'],
             'monitoring': ['Prometheus', 'Grafana', 'Datadog', 'New Relic', 'ELK Stack']
         }
-        self.tools = {
+        self.tools: Dict[str, List[str]] = {
             'version_control': ['Git', 'GitHub', 'GitLab', 'Bitbucket', 'SVN'],
             'testing': ['Jest', 'PyTest', 'JUnit', 'Selenium', 'Cypress', 'Postman'],
             'design': ['Figma', 'Sketch', 'Adobe XD', 'InVision'],
             'project_management': ['Jira', 'Confluence', 'Trello', 'Asana', 'Linear']
         }
-        self.certifications = {
+        self.certifications: Dict[str, List[str]] = {
             'cloud': ['AWS Solutions Architect', 'AWS Developer', 'GCP Professional Developer', 'Azure Developer'],
             'security': ['CISSP', 'CISM', 'CompTIA Security+', 'CEH'],
             'project_management': ['PMP', 'Scrum Master', 'Product Owner'],
@@ -54,7 +55,7 @@ class TechSkillsTaxonomy:
 
     def _initialize_job_templates(self): 
         """Initialize job description templates for different tech roles."""
-        self.job_templates = {
+        self.job_templates: Dict[str, Dict[str, List[str]]] = {
             'software_engineer': {
                 'titles': ['Software Engineer', 'Software Developer', 'Full Stack Developer', 'Backend Developer'],
                 'core_skills': ['programming_languages.backend', 'frameworks.web_backend', 'databases.relational', 'tools.version_control'],
@@ -119,7 +120,7 @@ class TechSkillsTaxonomy:
 
     def _initialize_resume_templates(self): 
         """Initialize resume templates for different experience levels."""
-        self.resume_templates = {
+        self.resume_templates: Dict[str, Dict[str, Any]] = {
             'entry': {
                 'experience_years_range': (0, 2),
                 'num_jobs_range': (0, 2),
