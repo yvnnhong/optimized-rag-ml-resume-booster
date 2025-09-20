@@ -119,7 +119,7 @@ class CandidateProfileGenerator:
         first_name = random.choice(self.taxonomy.first_names)
         last_name = random.choice(self.taxonomy.last_names)
         name:str = f"{first_name} {last_name}"
-        email = f"{first_name.lower()}.{last_name.lower()}@email.com"
+        email = f"{first_name.lower()}.{last_name.lower()}@email.com" #increase variance 
         #determine skill overlap based on match type 
         """
         random.uniform(a, b): returns a random float between a and b (inclusive).
@@ -148,5 +148,105 @@ class CandidateProfileGenerator:
         #^randomly selects num_matching_skills items from all_job_skills
 
         #next: add some unrelated skills
+        unrelated_skills = []
+        for category in self.taxonomy.programming_languages.values(): 
+            unrelated_skills.extend(category)
+        for category in self.taxonomy.frameworks.values(): 
+            unrelated_skills.extend(category)
+
+        #remove skills that are already in matching_skills
+        filtered_unrelated_skills = []
+        for s in unrelated_skills: 
+            if s not in matching_skills: 
+                filtered_unrelated_skills.append(s)
+        unrelated_skills = filtered_unrelated_skills
+        num_unrelated = random.randint(2,5)
+        additional_skills = random.sample(unrelated_skills, min(num_unrelated, len(unrelated_skills)))
+        candidate_skills = matching_skills + additional_skills
+        random.shuffle(candidate_skills)
+
+        # Generate experience
+        base_exp = target_job.experience_years
+        candidate_exp = max(0, int(base_exp * (1 + exp_years_variance)))
+        
+        # Determine experience level
+        if candidate_exp >= 8:
+            candidate_level = 'staff' if candidate_exp >= 10 else 'senior'
+        elif candidate_exp >= 3:
+            candidate_level = 'mid'
+        else:
+            candidate_level = 'entry'
+
+        # Generate work history
+        template = self.taxonomy.resume_templates[candidate_level]
+        num_jobs = random.randint(*template['num_jobs_range'])
+        
+        work_history = []
+        current_year = datetime.now().year
+        
+        for i in range(num_jobs):
+            start_year = current_year - candidate_exp + (i * (candidate_exp // max(1, num_jobs)))
+            end_year = start_year + random.randint(1, 3) if i < num_jobs - 1 else current_year
+            
+            work_history.append({
+                'company': random.choice(self.taxonomy.company_names),
+                'title': f"{random.choice(['Software', 'Backend', 'Frontend'])} {'Engineer' if candidate_level != 'entry' else 'Developer'}",
+                'start_year': start_year,
+                'end_year': end_year,
+                'responsibilities': random.sample([
+                    'Developed web applications using modern frameworks',
+                    'Collaborated with cross-functional teams',
+                    'Participated in code reviews and technical discussions',
+                    'Implemented automated testing and CI/CD pipelines',
+                    'Optimized application performance and scalability'
+                ], 3)
+            })
+        
+        #Generate projects
+        num_projects = random.randint(*template['num_projects_range'])
+        projects = []
+        project_names = ['E-commerce Platform', 'Task Management App', 'Data Visualization Tool', 
+                        'Real-time Chat Application', 'Machine Learning Pipeline', 'Mobile Fitness App']
+        
+        for _ in range(num_projects):
+            project_skills = random.sample(candidate_skills, min(4, len(candidate_skills)))
+            projects.append({
+                'name': random.choice(project_names),
+                'description': f"Built using {', '.join(project_skills[:3])}",
+                'technologies': project_skills
+            })
+
+        #Generate summary
+        summary_template = random.choice(template['summary_templates'])
+        primary_skill = matching_skills[0] if matching_skills else candidate_skills[0]
+        secondary_skill = matching_skills[1] if len(matching_skills) > 1 else candidate_skills[1] if len(candidate_skills) > 1 else 'web development'
+        
+        summary = summary_template.format(
+            years=candidate_exp,
+            job_category='engineer',
+            primary_skill=primary_skill,
+            secondary_skill=secondary_skill
+        )
+        
+        return CandidateProfile(
+            name=name,
+            email=email,
+            phone=f"({random.randint(100, 999)}) {random.randint(100, 999)}-{random.randint(1000, 9999)}",
+            linkedin=f"linkedin.com/in/{first_name.lower()}-{last_name.lower()}",
+            github=f"github.com/{first_name.lower()}{last_name.lower()}",
+            summary=summary,
+            experience_years=candidate_exp,
+            experience_level=candidate_level,
+            skills=candidate_skills,
+            education=[random.choice(template['education_level']) + ' in Computer Science'],
+            certifications=random.sample(target_job.certifications, 
+                                       min(len(target_job.certifications), random.randint(0, 2))),
+            projects=projects,
+            work_history=work_history
+        )
+    
+class TextFormatter: 
+    """Format job requirements and candidate profiles as text."""
+
     
         
