@@ -147,6 +147,10 @@ class CandidateProfileGenerator:
         matching_skills: List[str] = random.sample(all_job_skills, num_matching_skills)
         #^randomly selects num_matching_skills items from all_job_skills
 
+        """
+        START CHECKING FROM BELOW HERE AND GOING OVER COMPREHENSIVELY.
+        """
+
         #next: add some unrelated skills
         unrelated_skills = []
         for category in self.taxonomy.programming_languages.values(): 
