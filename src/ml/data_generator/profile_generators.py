@@ -218,8 +218,16 @@ class CandidateProfileGenerator:
 
         #Generate summary
         summary_template = random.choice(template['summary_templates'])
-        primary_skill = matching_skills[0] if matching_skills else candidate_skills[0]
-        secondary_skill = matching_skills[1] if len(matching_skills) > 1 else candidate_skills[1] if len(candidate_skills) > 1 else 'web development'
+        if matching_skills: 
+            primary_skill = matching_skills[0]
+        else: 
+            primary_skill = candidate_skills[0]
+        if len(matching_skills) > 1: 
+            secondary_skill = matching_skills[1]
+        elif len(candidate_skills) > 1: 
+            secondary_skill = candidate_skills[1]
+        else:
+            secondary_skill = 'web development'
         
         summary = summary_template.format(
             years=candidate_exp,
