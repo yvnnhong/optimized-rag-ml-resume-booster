@@ -78,7 +78,7 @@ class JobDescriptionGenerator:
         min_exp, max_exp = exp_mapping[experience_level]
         experience_years = random.randint(min_exp, max_exp)
 
-        #random.randint(a,b) -> some int between [a,b] 
+        #random.randint(a,b) -> some int between [a,b]
         #random.random() -> some float in [0.0, 1.0)
         #random.choice() -> picks some random item in a given list, uniformly (?)
 
