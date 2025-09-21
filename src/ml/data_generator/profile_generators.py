@@ -80,6 +80,7 @@ class JobDescriptionGenerator:
 
         #random.randint(a,b) -> some int between [a,b] 
         #random.random() -> some float in [0.0, 1.0)
+        #random.choice() -> picks some random item in a given list, uniformly (?)
 
         # Education and certifications
         education_reqs = ['Bachelor\'s degree in Computer Science or related field']
