@@ -258,8 +258,131 @@ class CandidateProfileGenerator:
             work_history=work_history
         )
     
-class TextFormatter: 
-    """Format job requirements and candidate profiles as text."""
+class TextFormatter:
+    """Format job requirements and candidate profiles as text"""
+    
+    @staticmethod
+    def format_job_description(job_req: JobRequirement) -> str:
+        """Convert JobRequirement to formatted job description text"""
+        
+        jd_text = f"""
+        {job_req.job_title}
+
+        Company: {job_req.company_type.title()} Technology Company
+        Industry: {job_req.industry.title()}
+
+        Job Requirements:
+        Experience Level: {job_req.experience_level.title()} ({job_req.experience_years}+ years)
+
+        Required Skills:
+        {chr(10).join(['• ' + skill for skill in job_req.required_skills])}
+
+        Preferred Skills:
+        {chr(10).join(['• ' + skill for skill in job_req.preferred_skills])}
+
+        Education Requirements:
+        {chr(10).join(['• ' + req for req in job_req.education_requirements])}
+
+        Key Responsibilities:
+        {chr(10).join(['• ' + resp for resp in job_req.responsibilities])}
+
+        {f'Certifications: {", ".join(job_req.certifications)}' if job_req.certifications else ''}
+        """.strip()
+        
+        return jd_text
+
+    @staticmethod
+    def format_resume_text(profile: CandidateProfile) -> str:
+        """Convert CandidateProfile to formatted resume text"""
+        
+        resume_text = f"""
+        {profile.name}
+        {profile.email} | {profile.phone} | {profile.linkedin} | {profile.github}
+
+        PROFESSIONAL SUMMARY
+        {profile.summary}
+
+        TECHNICAL SKILLS
+        {', '.join(profile.skills)}
+
+        EXPERIENCE
+        """
+        
+        for job in profile.work_history:
+            resume_text += f"""
+        {job['title']} - {job['company']} ({job['start_year']}-{job['end_year']})
+        {chr(10).join(['• ' + resp for resp in job['responsibilities']])}
+        """
+        
+        resume_text += f"""
+
+        PROJECTS
+        """
+        
+        for project in profile.projects:
+            resume_text += f"""
+        {project['name']}
+        • {project['description']}
+        • Technologies: {', '.join(project['technologies'])}
+        """
+        
+        resume_text += f"""
+
+        EDUCATION
+        {chr(10).join(['• ' + edu for edu in profile.education])}
+
+        {f'CERTIFICATIONS{chr(10)}{chr(10).join(["• " + cert for cert in profile.certifications])}' if profile.certifications else ''}
+        """.strip()
+        
+        return resume_text
+
+class MatchingMetricsCalculator:
+    """Calculate detailed matching metrics between job and candidate"""
+    
+    @staticmethod
+    def calculate_match_metrics(
+            job_req: JobRequirement, 
+            profile: CandidateProfile
+        ) -> Dict[str, Any]:
+        """Calculate detailed matching metrics between job and candidate"""
+        
+        all_job_skills = set([skill.lower() for skill in job_req.required_skills + job_req.preferred_skills])
+        candidate_skills = set([skill.lower() for skill in profile.skills])
+        
+        # Skill overlap
+        matching_skills = all_job_skills.intersection(candidate_skills)
+        skill_overlap_pct = len(matching_skills) / len(all_job_skills) if all_job_skills else 0
+        
+        # Missing critical skills
+        required_skills = set([skill.lower() for skill in job_req.required_skills])
+        missing_required = required_skills - candidate_skills
+        
+        # Experience match
+        exp_match = profile.experience_years >= job_req.experience_years
+        
+        # Education match (simplified)
+        edu_match = len(profile.education) > 0
+        
+        # Overall match score (weighted)
+        required_skill_match = len(required_skills.intersection(candidate_skills)) / len(required_skills) if required_skills else 1
+        preferred_skill_match = len(set([s.lower() for s in job_req.preferred_skills]).intersection(candidate_skills)) / len(job_req.preferred_skills) if job_req.preferred_skills else 0
+        
+        match_score = (
+            required_skill_match * 0.5 +  # Required skills weight
+            preferred_skill_match * 0.2 +  # Preferred skills weight  
+            (1.0 if exp_match else 0.3) * 0.2 +  # Experience weight
+            (1.0 if edu_match else 0.5) * 0.1   # Education weight
+        )
+        
+        return {
+            'skill_overlap_percentage': skill_overlap_pct,
+            'match_score': min(match_score, 1.0),
+            'experience_match': exp_match,
+            'education_match': edu_match,
+            'missing_critical_skills': list(missing_required),
+            'matching_skills_count': len(matching_skills),
+            'total_required_skills': len(required_skills)
+        }
 
     
         
