@@ -200,6 +200,157 @@ class TechJobDataGenerator:
         
         logger.info(f"Loaded {len(dataset)} training examples from {input_path}")
         return dataset
+    
+    def get_dataset_statistics(self, dataset: List[TrainingExample]) -> Dict[str, Any]:
+        """Calculate statistics for the generated dataset"""
+        
+        if not dataset:
+            return {}
+        
+        # Match distribution
+        positive_matches = sum(1 for ex in dataset if ex.match_label == 1)
+        negative_matches = len(dataset) - positive_matches
+        
+        # Role distribution
+        role_counts = {}
+        for example in dataset:
+            role = example.job_requirements.job_title
+            role_counts[role] = role_counts.get(role, 0) + 1
+        
+        # Experience level distribution
+        exp_level_counts = {}
+        for example in dataset:
+            level = example.job_requirements.experience_level
+            exp_level_counts[level] = exp_level_counts.get(level, 0) + 1
+        
+        # Score distribution
+        scores = [ex.match_score for ex in dataset]
+        avg_score = np.mean(scores)
+        score_std = np.std(scores)
+        
+        # Skill overlap distribution
+        overlaps = [ex.skill_overlap_percentage for ex in dataset]
+        avg_overlap = np.mean(overlaps)
+        overlap_std = np.std(overlaps)
+        
+        return {
+            'total_examples': len(dataset),
+            'positive_matches': positive_matches,
+            'negative_matches': negative_matches,
+            'match_ratio': positive_matches / len(dataset),
+            'role_distribution': role_counts,
+            'experience_level_distribution': exp_level_counts,
+            'average_match_score': avg_score,
+            'match_score_std': score_std,
+            'average_skill_overlap': avg_overlap,
+            'skill_overlap_std': overlap_std,
+            'score_quartiles': {
+                'q25': np.percentile(scores, 25),
+                'q50': np.percentile(scores, 50),
+                'q75': np.percentile(scores, 75)
+            }
+        }
+
+    def print_example(self, example: TrainingExample, show_full_text: bool = False):
+        """Print a training example in a readable format"""
+        
+        print(f"=== TRAINING EXAMPLE ===")
+        print(f"Match Label: {example.match_label} ({'MATCH' if example.match_label else 'NO MATCH'})")
+        print(f"Match Score: {example.match_score:.3f}")
+        print(f"Skill Overlap: {example.skill_overlap_percentage:.3f}")
+        print(f"Experience Match: {example.experience_match}")
+        
+        print(f"\n--- JOB REQUIREMENTS ---")
+        job = example.job_requirements
+        print(f"Title: {job.job_title}")
+        print(f"Experience: {job.experience_level} ({job.experience_years}+ years)")
+        print(f"Required Skills: {', '.join(job.required_skills[:5])}{'...' if len(job.required_skills) > 5 else ''}")
+        print(f"Preferred Skills: {', '.join(job.preferred_skills[:3])}{'...' if len(job.preferred_skills) > 3 else ''}")
+        
+        print(f"\n--- CANDIDATE PROFILE ---")
+        candidate = example.candidate_profile
+        print(f"Name: {candidate.name}")
+        print(f"Experience: {candidate.experience_level} ({candidate.experience_years} years)")
+        print(f"Skills: {', '.join(candidate.skills[:8])}{'...' if len(candidate.skills) > 8 else ''}")
+        print(f"Education: {candidate.education[0] if candidate.education else 'N/A'}")
+        
+        if example.missing_critical_skills:
+            print(f"\nMissing Critical Skills: {', '.join(example.missing_critical_skills)}")
+        
+        if show_full_text:
+            print(f"\n--- FULL JOB DESCRIPTION ---")
+            print(example.job_description)
+            print(f"\n--- FULL RESUME TEXT ---")
+            print(example.resume_text)
+        
+        print("="*50)
+
+
+# Example usage and testing functions
+def generate_sample_dataset():
+    """Generate and display a small sample dataset"""
+    
+    # Initialize generator
+    generator = TechJobDataGenerator(seed=42)
+    
+    # Generate small sample dataset
+    print("Generating sample training dataset...")
+    dataset = generator.generate_training_dataset(num_examples=50)
+    
+    # Show statistics
+    print("\n=== DATASET STATISTICS ===")
+    stats = generator.get_dataset_statistics(dataset)
+    print(f"Total examples: {stats['total_examples']}")
+    print(f"Positive matches: {stats['positive_matches']} ({stats['match_ratio']:.1%})")
+    print(f"Negative matches: {stats['negative_matches']}")
+    print(f"Average match score: {stats['average_match_score']:.3f} ± {stats['match_score_std']:.3f}")
+    print(f"Average skill overlap: {stats['average_skill_overlap']:.3f} ± {stats['skill_overlap_std']:.3f}")
+    
+    print(f"\nRole distribution:")
+    for role, count in stats['role_distribution'].items():
+        print(f"  {role}: {count}")
+    
+    print(f"\nExperience level distribution:")
+    for level, count in stats['experience_level_distribution'].items():
+        print(f"  {level}: {count}")
+    
+    # Show a few examples
+    print(f"\n=== SAMPLE EXAMPLES ===")
+    
+    # Show one strong match
+    strong_matches = [ex for ex in dataset if ex.match_label == 1 and ex.match_score > 0.8]
+    if strong_matches:
+        print(f"\n--- STRONG MATCH EXAMPLE ---")
+        generator.print_example(strong_matches[0])
+    
+    # Show one weak match/no match
+    weak_matches = [ex for ex in dataset if ex.match_label == 0]
+    if weak_matches:
+        print(f"\n--- NO MATCH EXAMPLE ---")
+        generator.print_example(weak_matches[0])
+    
+    return dataset, generator
+
+
+if __name__ == "__main__":
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Generate sample dataset
+    dataset, generator = generate_sample_dataset()
+    
+    # Optionally save dataset
+    output_path = "data/training/synthetic_dataset_sample.json"
+    generator.save_dataset(dataset, output_path)
+    print(f"\nDataset saved to {output_path}")
+    
+    # Test loading
+    loaded_dataset = generator.load_dataset(output_path)
+    print(f"Successfully loaded {len(loaded_dataset)} examples")
+
         
 
 
