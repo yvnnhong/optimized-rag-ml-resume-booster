@@ -169,6 +169,9 @@ class TechJobDataGenerator:
             #json.dump() - Writes the data as JSON to the file
         
         logger.info(f"Saved {len(dataset)} training examples to {output_path}")
+
+    #note: The ** unpacks the dictionary into keyword arguments:
+    def 
         
 
 
