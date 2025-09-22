@@ -373,16 +373,33 @@ class MatchingMetricsCalculator: #REFACTOR THIS AND GO OVER
             profile: CandidateProfile
         ) -> Dict[str, Any]:
         """Calculate detailed matching metrics between job and candidate"""
-        
-        all_job_skills = set([skill.lower() for skill in job_req.required_skills + job_req.preferred_skills])
-        candidate_skills = set([skill.lower() for skill in profile.skills])
-        
+
+        all_job_skills_list = []
+        combined_skills: List[str] = job_req.required_skills + job_req.preferred_skills
+        for skill in combined_skills: 
+            all_job_skills_list.append(skill.lower())
+        all_job_skills = set(all_job_skills_list) #remove duplicate job skills
+
+        candidate_skills_list = []
+        for skill in profile.skills: 
+            candidate_skills_list.append(skill.lower())
+        candidate_skills = set(candidate_skills_list)
+
         # Skill overlap
         matching_skills = all_job_skills.intersection(candidate_skills)
-        skill_overlap_pct = len(matching_skills) / len(all_job_skills) if all_job_skills else 0
-        
+
+        # Calculate skill overlap percentage
+        if all_job_skills:
+            skill_overlap_pct = len(matching_skills) / len(all_job_skills)
+        else:
+            skill_overlap_pct = 0
+
         # Missing critical skills
-        required_skills = set([skill.lower() for skill in job_req.required_skills])
+        required_skills_list = []
+        for skill in job_req.required_skills:
+            required_skills_list.append(skill.lower())
+        required_skills = set(required_skills_list)
+
         missing_required = required_skills - candidate_skills
         
         # Experience match
@@ -393,13 +410,37 @@ class MatchingMetricsCalculator: #REFACTOR THIS AND GO OVER
         
         # Overall match score (weighted)
         required_skill_match = len(required_skills.intersection(candidate_skills)) / len(required_skills) if required_skills else 1
-        preferred_skill_match = len(set([s.lower() for s in job_req.preferred_skills]).intersection(candidate_skills)) / len(job_req.preferred_skills) if job_req.preferred_skills else 0
+        if job_req.preferred_skills:
+            preferred_skills_list = []
+            for s in job_req.preferred_skills:
+                preferred_skills_list.append(s.lower())
+            preferred_skills_set = set(preferred_skills_list)
+            # Find intersection with candidate skills
+            matching_preferred_skills = preferred_skills_set.intersection(candidate_skills)
+    
+            # Compute match percentage
+            preferred_skill_match = len(matching_preferred_skills) / len(job_req.preferred_skills)
+        else:
+            preferred_skill_match = 0
         
+        # Calculate experience weight without ternary operator
+        if exp_match:
+            experience_weight = 1.0
+        else:
+            experience_weight = 0.3
+
+        # Calculate education weight without ternary operator
+        if edu_match:
+            education_weight = 1.0
+        else:
+            education_weight = 0.5
+
+        # Calculate overall match score
         match_score = (
-            required_skill_match * 0.5 +  # Required skills weight
-            preferred_skill_match * 0.2 +  # Preferred skills weight  
-            (1.0 if exp_match else 0.3) * 0.2 +  # Experience weight
-            (1.0 if edu_match else 0.5) * 0.1   # Education weight
+            required_skill_match * 0.5 +      # Required skills weight
+            preferred_skill_match * 0.2 +     # Preferred skills weight  
+            experience_weight * 0.2 +         # Experience weight
+            education_weight * 0.1            # Education weight
         )
         
         return {
