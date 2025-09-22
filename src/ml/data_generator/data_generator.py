@@ -139,4 +139,14 @@ class TechJobDataGenerator:
                 p=list(match_distribution.values())
             )
 
+            # Generate training example
+            example = self.generate_training_example(role_type, exp_level, match_type)
+            dataset.append(example)
+            
+            if (i + 1) % 100 == 0:
+                logger.info(f"Generated {i + 1}/{num_examples} training examples")
+        return dataset
+
+
+
 
