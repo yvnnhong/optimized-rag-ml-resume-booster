@@ -170,8 +170,36 @@ class TechJobDataGenerator:
         
         logger.info(f"Saved {len(dataset)} training examples to {output_path}")
 
-    #note: The ** unpacks the dictionary into keyword arguments:
-    def 
+    
+    def load_dataset(self, input_path: str) -> List[TrainingExample]:  
+        """Load dataset from JSON file."""
+        with open(input_path, 'r', encoding='utf-8') as f:
+            dataset_dict = json.load(f)
+        
+        # Convert dictionaries back to dataclasses
+        dataset = []
+        for example_dict in dataset_dict:
+            # Reconstruct nested dataclasses
+            #note: The ** unpacks the dictionary into keyword arguments:
+            job_req: JobRequirement = JobRequirement(**example_dict['job_requirements'])
+            profile: CandidateProfile = CandidateProfile(**example_dict['candidate_profile'])
+            
+            example = TrainingExample(
+                job_description=example_dict['job_description'],
+                resume_text=example_dict['resume_text'],
+                job_requirements=job_req,
+                candidate_profile=profile,
+                match_label=example_dict['match_label'],
+                match_score=example_dict['match_score'],
+                skill_overlap_percentage=example_dict['skill_overlap_percentage'],
+                experience_match=example_dict['experience_match'],
+                education_match=example_dict['education_match'],
+                missing_critical_skills=example_dict['missing_critical_skills']
+            )
+            dataset.append(example)
+        
+        logger.info(f"Loaded {len(dataset)} training examples from {input_path}")
+        return dataset
         
 
 
