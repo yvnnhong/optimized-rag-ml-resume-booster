@@ -78,5 +78,65 @@ class TechJobDataGenerator:
             education_match=metrics['education_match'],
             missing_critical_skills=metrics['missing_critical_skills']
         )
+    
+    def generate_training_dataset(
+            self,
+            num_examples: int = 1000,
+            role_distribution: Optional[Dict[str, float]] = None,
+            experience_distribution: Optional[Dict[str, float]] = None,
+            match_distribution: Optional[Dict[str, float]] = None
+        ) -> List[TrainingExample]: 
+        """Generate a balanced training dataset."""
+        #Default distributions 
+        if role_distribution is None: 
+            role_distribution = {
+                'software_engineer': 0.4,
+                'frontend_engineer': 0.2,
+                'data_scientist': 0.2,
+                'devops_engineer': 0.1,
+                'mobile_developer': 0.1
+            }
+        if experience_distribution is None:
+            experience_distribution = {
+                'entry': 0.3,
+                'mid': 0.4,
+                'senior': 0.25,
+                'staff': 0.05
+            }
+        
+        if match_distribution is None:
+            match_distribution = {
+                'strong_match': 0.3,
+                'partial_match': 0.4,
+                'weak_match': 0.3
+            }
+        
+        dataset = []
+
+        """
+        np.random.choice(a, p=None)
+        a = the array/list to choose from
+        p = the probability weights for each element
+        Note: Converting the keys and values to lists preserves the order. 
+        """
+
+        for i in range(num_examples):
+            # Sample role type
+            role_type = np.random.choice(
+                list(role_distribution.keys()),
+                p=list(role_distribution.values())
+            )
+            
+            # Sample experience level
+            exp_level = np.random.choice(
+                list(experience_distribution.keys()),
+                p=list(experience_distribution.values())
+            )
+            
+            # Sample match type
+            match_type = np.random.choice(
+                list(match_distribution.keys()),
+                p=list(match_distribution.values())
+            )
 
 
