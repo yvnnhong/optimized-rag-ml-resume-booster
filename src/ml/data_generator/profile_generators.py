@@ -5,7 +5,7 @@ Handles the creation of synthetic job descriptions and candidate profiles.
 """
 import random 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
 from dataclasses import dataclass
 from .tech_taxonomy import TechSkillsTaxonomy
@@ -260,11 +260,39 @@ class CandidateProfileGenerator:
     
 class TextFormatter:
     """Format job requirements and candidate profiles as text"""
-    
     @staticmethod
     def format_job_description(job_req: JobRequirement) -> str:
         """Convert JobRequirement to formatted job description text"""
-        
+        #Build required skills list 
+        required_skills_list = []
+        for skill in job_req.required_skills: 
+            required_skills_list.append('• ' + skill)
+        required_skills_text = chr(10).join(required_skills_list)
+    
+        # Build preferred skills list
+        preferred_skills_list = []
+        for skill in job_req.preferred_skills:
+            preferred_skills_list.append('• ' + skill)
+        preferred_skills_text = chr(10).join(preferred_skills_list)
+    
+        # Build education requirements list
+        education_requirements_list = []
+        for req in job_req.education_requirements:
+            education_requirements_list.append('• ' + req)
+        education_requirements_text = chr(10).join(education_requirements_list)
+    
+        # Build responsibilities list
+        responsibilities_list = []
+        for resp in job_req.responsibilities:
+            responsibilities_list.append('• ' + resp)
+        responsibilities_text = chr(10).join(responsibilities_list)
+
+        # Handle certifications section
+        if job_req.certifications:
+            certifications_text = f'Certifications: {", ".join(job_req.certifications)}'
+        else:
+            certifications_text = ''
+    
         jd_text = f"""
         {job_req.job_title}
 
@@ -275,20 +303,20 @@ class TextFormatter:
         Experience Level: {job_req.experience_level.title()} ({job_req.experience_years}+ years)
 
         Required Skills:
-        {chr(10).join(['• ' + skill for skill in job_req.required_skills])}
+        {required_skills_text}
 
         Preferred Skills:
-        {chr(10).join(['• ' + skill for skill in job_req.preferred_skills])}
+        {preferred_skills_text}
 
         Education Requirements:
-        {chr(10).join(['• ' + req for req in job_req.education_requirements])}
+        {education_requirements_text}
 
         Key Responsibilities:
-        {chr(10).join(['• ' + resp for resp in job_req.responsibilities])}
+        {responsibilities_text}
 
-        {f'Certifications: {", ".join(job_req.certifications)}' if job_req.certifications else ''}
+        {certifications_text}
         """.strip()
-        
+    
         return jd_text
 
     @staticmethod
