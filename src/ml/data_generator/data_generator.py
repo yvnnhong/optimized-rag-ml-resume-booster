@@ -146,6 +146,30 @@ class TechJobDataGenerator:
             if (i + 1) % 100 == 0:
                 logger.info(f"Generated {i + 1}/{num_examples} training examples")
         return dataset
+    
+    def save_dataset(
+            self,
+            dataset: List[TrainingExample],
+            output_path: str
+        ) -> None: 
+        """
+        Save dataset to JSON file. 
+        """
+        #Convert dataclasses to dictionaries: 
+        dataset_dict = []
+        for example in dataset: 
+            example_dict = asdict(example) #asdict converts a dataclass object to a dict
+            dataset_dict.append(example_dict)
+        #create output directory if it doesn't exist
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        # Save to JSON
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(dataset_dict, f, indent=2, ensure_ascii=False)
+            #json.dump() - Writes the data as JSON to the file
+        
+        logger.info(f"Saved {len(dataset)} training examples to {output_path}")
+        
 
 
 
