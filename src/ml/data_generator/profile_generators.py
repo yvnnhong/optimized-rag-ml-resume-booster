@@ -364,7 +364,7 @@ class TextFormatter:
         
         return resume_text
 
-class MatchingMetricsCalculator:
+class MatchingMetricsCalculator: #REFACTOR THIS AND GO OVER 
     """Calculate detailed matching metrics between job and candidate"""
     
     @staticmethod

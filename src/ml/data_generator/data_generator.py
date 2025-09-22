@@ -52,3 +52,31 @@ class TechJobDataGenerator:
             match_type: str
         ) -> TrainingExample: 
         """Generate a complete training example."""
+        #Generate job and candidate: 
+        job_req = self.job_generator.generate(role_type, experience_level)
+        profile = self.candidate_generator.generate(job_req, match_type)
+        
+        # Format as text
+        job_text = self.text_formatter.format_job_description(job_req)
+        resume_text = self.text_formatter.format_resume_text(profile)
+        
+        # Calculate metrics
+        metrics = self.metrics_calculator.calculate_match_metrics(job_req, profile)
+        if metrics['match_score'] >= 0.6: 
+            match_label = 1
+        else: 
+            match_label = 0
+        return TrainingExample(
+            job_description=job_text,
+            resume_text=resume_text,
+            job_requirements=job_req,
+            candidate_profile=profile,
+            match_label=match_label,
+            match_score=metrics['match_score'],
+            skill_overlap_percentage=metrics['skill_overlap_percentage'],
+            experience_match=metrics['experience_match'],
+            education_match=metrics['education_match'],
+            missing_critical_skills=metrics['missing_critical_skills']
+        )
+
+
