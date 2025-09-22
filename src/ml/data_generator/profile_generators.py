@@ -268,6 +268,9 @@ class TextFormatter:
         for skill in job_req.required_skills: 
             required_skills_list.append('• ' + skill)
         required_skills_text = chr(10).join(required_skills_list)
+        #note: chr(10) corresponds to the newline character '\n'
+        #we are using the ascii representation to avoid 
+        #potential escape character issues later
     
         # Build preferred skills list
         preferred_skills_list = []
